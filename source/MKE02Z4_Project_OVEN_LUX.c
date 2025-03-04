@@ -168,6 +168,7 @@ void DEMO_UART_IRQHandler(void)
   //   UART_WriteBlocking( DEMO_UART,data1,sizeof(data1));
    PRINTF("%s", first);
 
+
     /* If new data arrived. */
 //    if ((kUART_RxDataRegFullFlag | kUART_RxOverrunFlag) & UART_GetStatusFlags(DEMO_UART))
 //    {
@@ -296,6 +297,7 @@ int main(void) {
  //   Config_UART();
  Config_PWM_NEWTRAL_LINE();
 
+ //Fid github
 
     //Config_PWM_NEWTRAL_LINE_1();
 
