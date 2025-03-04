@@ -229,12 +229,15 @@ void Config_PWM_NEWTRAL_LINE_1(void)
 
 uint16_t countFreq1 = 8950;
 
+bool state=0;
+
 void KBI0_IRQHandler(void)
 {
     if (KBI_IsInterruptRequestDetected(EXAMPLE_KBI))
     {
 		if (GPIO_PinRead(DOOR_SENSOR_GPIO,DOOR_SENSOR_PIN) == 0)
 		{
+
 			SDK_DelayAtLeastUs(countFreq1, CLOCK_GetFreq(kCLOCK_CoreSysClk));
 			GPIO_PinWrite(TRIAC_LAMP_GPIO,TRIAC_LAMP_PIN,1);
 			SDK_DelayAtLeastUs(10, CLOCK_GetFreq(kCLOCK_CoreSysClk));
@@ -262,12 +265,12 @@ void KBI0_IRQHandler(void)
 			}
 			else {
 				countFreq1 =9000;
-				FTM_StopTimer(BOARD_FTM_BASEADDR);
+			FTM_StopTimer(BOARD_FTM_BASEADDR);
+				state=1;
 			}
 		}
     }
 }
-
 
 
 int main(void) {
@@ -279,7 +282,7 @@ int main(void) {
 
 
 //Config interrupt
-    kbi_config_t kbiConfig;
+
           //
 //    gpio_pin_config_t gpioConfig = { kGPIO_DigitalInput, 0 };
 //    SIM->SOPT &= ~SIM_SOPT_RSTPE_MASK;   // Vô hiệu hóa RESET trên PTA3
@@ -294,25 +297,24 @@ int main(void) {
 
     BOARD_InitDebugConsole();
     BOARD_InitBootPeripherals();
-    Config_PWM_NEWTRAL_LINE();
 
- //Fid github
-
-    //Config_PWM_NEWTRAL_LINE_1();
-
-
-   // ADC_Init_Config();
-//    IRQ_EnableInterrupt(IRQ, true);
-//    EnableIRQ(IRQ_IRQn);
-//	UART_WriteBlocking(DEMO_UART,g_tipString,sizeof(g_tipString)-1);
-
-  //  Config_ADC();
-   // Config_Timer();
+    kbi_config_t kbiConfig;
     kbiConfig.mode        = kKBI_EdgesDetect;
     kbiConfig.pinsEnabled = 1 << EXAMPLE_KBI_PINS;
     kbiConfig.pinsEdge    = 0 << EXAMPLE_KBI_PINS; /* Raising edge.*/
     KBI_Init(EXAMPLE_KBI, &kbiConfig);
 
+ //
+
+    //Config_PWM_NEWTRAL_LINE_1();
+
+
+//    IRQ_EnableInterrupt(IRQ, true);
+//    EnableIRQ(IRQ_IRQn);
+    Config_UART();
+//	UART_WriteBlocking(DEMO_UART,g_tipString,sizeof(g_tipString));
+   Config_ADC();
+    Config_Timer();
 
 
 
@@ -320,7 +322,7 @@ int main(void) {
 //       GPIO_PinWrite(TRIAC_LAMP_GPIO,TRIAC_LAMP_PIN,1U);
 //       GPIO_PinWrite(TRIAC_LAMP_GPIO,TRIAC_LAMP_PIN,0U);
 //       //E0
-//       GPIO_PinWrite(TOP_FAN_GPIO, TOP_FAN_PIN, 1U);
+     // GPIO_PinWrite(TOP_FAN_GPIO, TOP_FAN_PIN, 1U);
 //       GPIO_PinWrite(TOP_FAN_GPIO, TOP_FAN_PIN, 0U);
 //       //E2
 //       GPIO_PinWrite(UNKNOWN2_GPIO, UNKNOWN2_PIN, 1U);
@@ -391,6 +393,8 @@ int main(void) {
        //  GPIO_PinWrite(kGPIO_PORTB,0U,1);
 //    	for (i=4;i<128;i++)
 //
+    	FTM_StartTimer(BOARD_FTM_BASEADDR, kFTM_SystemClock);
+
 //    	{
 //
 //    	dimming=i;
@@ -411,10 +415,20 @@ int main(void) {
 
  if(GPIO_PinRead(DOOR_SENSOR_GPIO,DOOR_SENSOR_PIN)==0)
  {
-	FTM_StartTimer(BOARD_FTM_BASEADDR, kFTM_SystemClock);
+		FTM_StartTimer(BOARD_FTM_BASEADDR, kFTM_SystemClock);
+
 //		SDK_DelayAtLeastUs(4000000, CLOCK_GetFreq(kCLOCK_CoreSysClk)); // Delay 1s
 //
 }
+
+if(state==1)
+{
+	FTM_StartTimer(BOARD_FTM_BASEADDR, kFTM_SystemClock);
+	state=0;
+}
+
+
+
 
 //    	//GPIO_PinWrite(GPIOD,5U,1);
 //    	if (state==0) // Kiểm tra nút nhấn

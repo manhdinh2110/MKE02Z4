@@ -1,6 +1,7 @@
 #include "OVEN_UART.h"
 
 
+uint8_t txbuff[]   = "Uart polling example\r\nBoard will send back received characters\r\n";
 
 
 #define DEMO_UART            UART1
@@ -28,11 +29,13 @@ void Config_UART(void)
     config.enableRx     = true;
 
     UART_Init(DEMO_UART, &config, DEMO_UART_CLK_FREQ);
+    UART_WriteBlocking(DEMO_UART, txbuff, sizeof(txbuff) - 1);
 
+	//UART_WriteBlocking(DEMO_UART,g_tipString,sizeof(g_tipString));
 
     /* Enable RX interrupt. */
-    UART_EnableInterrupts(DEMO_UART, kUART_RxDataRegFullInterruptEnable | kUART_RxOverrunInterruptEnable);
-    EnableIRQ(DEMO_UART_IRQn);
+  //  UART_EnableInterrupts(DEMO_UART, kUART_RxDataRegFullInterruptEnable | kUART_RxOverrunInterruptEnable);
+   // EnableIRQ(DEMO_UART_IRQn);
 
 }
 void UART_WriteMultipleBytes(uint8_t *data, uint32_t length) {

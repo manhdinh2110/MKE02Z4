@@ -195,9 +195,19 @@ const ftm_config_t FTM2_config = {
   .useGlobalTimeBase = false
 };
 
+const ftm_chnl_pwm_config_param_t FTM2_pwmSignalParams[] = {
+  {
+    .chnlNumber = kFTM_Chnl_2,
+    .level = kFTM_HighTrue,
+    .dutyValue = 600,
+  }
+};
+
 static void FTM2_init(void) {
   FTM_Init(FTM2_PERIPHERAL, &FTM2_config);
   FTM_SetTimerPeriod(FTM2_PERIPHERAL, FTM2_TIMER_MODULO_VALUE);
+  FTM_SetupPwmMode(FTM2_PERIPHERAL, FTM2_pwmSignalParams, sizeof(FTM2_pwmSignalParams) / sizeof(ftm_chnl_pwm_config_param_t), kFTM_EdgeAlignedPwm);
+
   FTM_StartTimer(FTM2_PERIPHERAL, kFTM_SystemClock);
 }
 

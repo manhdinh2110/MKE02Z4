@@ -43,15 +43,15 @@ PID PID_Motor={1.0,0.3,0.2,0,0,0,0,0};
 void Config_PWM_NEWTRAL_LINE(void)
 {
 
-    ftm_config_t ftmInfo;
+   ftm_config_t ftmInfo;
     ftm_chnl_pwm_signal_param_t ftmParam;
     ftm_pwm_level_select_t pwmLevel = FTM_PWM_ON_LEVEL;
 
     FTM_GetDefaultConfig(&ftmInfo);
-    ftmInfo.prescale = FTM_CalculateCounterClkDiv(BOARD_FTM_BASEADDR, DEMO_PWM_FREQUENCY, FTM_SOURCE_CLOCK);
-    FTM_Init(BOARD_FTM_BASEADDR, &ftmInfo);
+//    ftmInfo.prescale = FTM_CalculateCounterClkDiv(BOARD_FTM_BASEADDR, DEMO_PWM_FREQUENCY, FTM_SOURCE_CLOCK);
+//    FTM_Init(BOARD_FTM_BASEADDR, &ftmInfo);
          /* Configure ftm params with frequency 24kHZ */
-    ftmParam.chnlNumber            = BOARD_FTM_CHANNEL;
+   ftmParam.chnlNumber            = BOARD_FTM_CHANNEL;
     ftmParam.level                 = pwmLevel;
     ftmParam.dutyCyclePercent      = updatedDutycycle;
     ftmParam.firstEdgeDelayPercent = 0U;
@@ -60,11 +60,7 @@ void Config_PWM_NEWTRAL_LINE(void)
     ftmParam.enableDeadtime        = false;
     if (kStatus_Success !=
     FTM_SetupPwm(BOARD_FTM_BASEADDR, &ftmParam, 1U, kFTM_CenterAlignedPwm, DEMO_PWM_FREQUENCY, FTM_SOURCE_CLOCK))
-    {
-             // PRINTF("\r\nSetup PWM fail, please check the configuration parameters!\r\n");
-     return -1;
-    }
-	//FTM_StartTimer(BOARD_FTM_BASEADDR, kFTM_SystemClock);
+	FTM_StartTimer(BOARD_FTM_BASEADDR, kFTM_SystemClock);
 
 }
 

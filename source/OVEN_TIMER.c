@@ -15,6 +15,7 @@
 #include "fsl_adc.h"
 #include "fsl_debug_console.h"
 #include "OVEN_PWM.h"
+#include "fsl_ftm.h"
 
 uint8_t SP=100;
 
@@ -30,7 +31,6 @@ extern float Temperature;
 
 
 #define DEMO_PIT_CHANNEL_1  kPIT_Chnl_1
-#define PIT_LED_HANDLER   PIT_CH1_IRQHandler
 #define PIT_IRQ_ID_1        PIT_CH1_IRQn
 
 #define PIT_SOURCE_CLOCK CLOCK_GetFreq(kCLOCK_BusClk)
@@ -44,41 +44,41 @@ uint16_t g_AdcConversionValue;
 
 void Config_Timer(void)
 {
-	tpm_config_t tpmInfo;
-//	tpm_config_t tpmInfo1;
-//
-    TPM_GetDefaultConfig(&tpmInfo);
-//    TPM_GetDefaultConfig(&tpmInfo1);
-//
-    tpmInfo.prescale = TPM_PRESCALER_0;
-//    tpmInfo1.prescale = TPM_PRESCALER_1;
-//
-//    /* Initialize TPM module */
-    TPM_Init(BOARD_TPM_0, &tpmInfo);
-//    TPM_Init(BOARD_TPM_1, &tpmInfo1);
-//
-//    /* Set timer period */
-    TPM_SetTimerPeriod(BOARD_TPM_0, USEC_TO_COUNT(DEMO_TIMER_PERIOD_US, TPM_SOURCE_CLOCK / (1U << tpmInfo.prescale)));
-//    TPM_SetTimerPeriod(BOARD_TPM_1, USEC_TO_COUNT(DEMO_TIMER_PERIOD_US, TPM_SOURCE_CLOCK / (1U << tpmInfo1.prescale)));
-//
-    TPM_EnableInterrupts(BOARD_TPM_0, kTPM_TimeOverflowInterruptEnable);
-//    TPM_EnableInterrupts(BOARD_TPM_1, kTPM_TimeOverflowInterruptEnable);
-//
-    EnableIRQ(BOARD_TPM_IRQ_NUM_0);
-//    EnableIRQ(BOARD_TPM_IRQ_NUM_1);
-//
-    TPM_StartTimer(BOARD_TPM_0, kTPM_SystemClock);
-//    TPM_StartTimer(BOARD_TPM_1, kTPM_SystemClock);
+//	tpm_config_t tpmInfo;
+////tpm_config_t tpmInfo1;
+////
+//    TPM_GetDefaultConfig(&tpmInfo);
+//  // TPM_GetDefaultConfig(&tpmInfo1);
+////
+//    tpmInfo.prescale = TPM_PRESCALER_0;
+////   tpmInfo1.prescale = TPM_PRESCALER_1;
+////
+////    /* Initialize TPM module */
+//    TPM_Init(BOARD_TPM_0, &tpmInfo);
+//  // TPM_Init(BOARD_TPM_1, &tpmInfo1);
+////
+////    /* Set timer period */
+//    TPM_SetTimerPeriod(BOARD_TPM_0, USEC_TO_COUNT(DEMO_TIMER_PERIOD_US, TPM_SOURCE_CLOCK / (1U << tpmInfo.prescale)));
+//    //TPM_SetTimerPeriod(BOARD_TPM_1, USEC_TO_COUNT(DEMO_TIMER_PERIOD_US, TPM_SOURCE_CLOCK / (1U << tpmInfo1.prescale)));
+////
+//    TPM_EnableInterrupts(BOARD_TPM_0, kTPM_TimeOverflowInterruptEnable);
+//  //  TPM_EnableInterrupts(BOARD_TPM_1, kTPM_TimeOverflowInterruptEnable);
+////
+//    EnableIRQ(BOARD_TPM_IRQ_NUM_0);
+//    //EnableIRQ(BOARD_TPM_IRQ_NUM_1);
+////
+//    TPM_StartTimer(BOARD_TPM_0, kTPM_SystemClock);
+   // TPM_StartTimer(BOARD_TPM_1, kTPM_SystemClock);
 
-    pit_config_t pitConfig;
+   pit_config_t pitConfig;
 //
-   PIT_GetDefaultConfig(&pitConfig);
+  PIT_GetDefaultConfig(&pitConfig);
 //
 //        /* Init pit module */
-        PIT_Init(DEMO_PIT_BASEADDR, &pitConfig);
+       PIT_Init(DEMO_PIT_BASEADDR, &pitConfig);
 //
 //        /* Set timer period for channel 0 */
-      PIT_SetTimerPeriod(DEMO_PIT_BASEADDR, DEMO_PIT_CHANNEL, USEC_TO_COUNT(500000U, PIT_SOURCE_CLOCK));
+      PIT_SetTimerPeriod(DEMO_PIT_BASEADDR, DEMO_PIT_CHANNEL, USEC_TO_COUNT(700000U, PIT_SOURCE_CLOCK));
 //
 //        /* Enable timer interrupts for channel 0 */
         PIT_EnableInterrupts(DEMO_PIT_BASEADDR, DEMO_PIT_CHANNEL, kPIT_TimerInterruptEnable);
@@ -87,22 +87,22 @@ void Config_Timer(void)
         EnableIRQ(PIT_IRQ_ID);
 //
       PIT_StartTimer(DEMO_PIT_BASEADDR, DEMO_PIT_CHANNEL);
-//
-//
-      // PIT_SetTimerPeriod(DEMO_PIT_BASEADDR, DEMO_PIT_CHANNEL_1, USEC_TO_COUNT(200000U, PIT_SOURCE_CLOCK));
-//
-//        /* Enable timer interrupts for channel 0 */
-       // PIT_EnableInterrupts(DEMO_PIT_BASEADDR, DEMO_PIT_CHANNEL_1, kPIT_TimerInterruptEnable);
-//
-//        /* Enable at the NVIC */
-        EnableIRQ(PIT_IRQ_ID_1);
-     //   PIT_StartTimer(DEMO_PIT_BASEADDR, DEMO_PIT_CHANNEL_1);
 
+//
+//
+       PIT_SetTimerPeriod(DEMO_PIT_BASEADDR, DEMO_PIT_CHANNEL_1, USEC_TO_COUNT(500000, PIT_SOURCE_CLOCK));
+////
+////        /* Enable timer interrupts for channel 0 */
+        PIT_EnableInterrupts(DEMO_PIT_BASEADDR, DEMO_PIT_CHANNEL_1, kPIT_TimerInterruptEnable);
+////
+////        /* Enable at the NVIC */
+       EnableIRQ(PIT_IRQ_ID_1);
+      PIT_StartTimer(DEMO_PIT_BASEADDR, DEMO_PIT_CHANNEL_1);
 
 
 }
-adc_channel_config_t adcChannelConfigStruct;
 
+adc_channel_config_t adcChannelConfigStruct;
 
 
 
@@ -112,14 +112,21 @@ void Config_ADC(void)
 {
 
     adc_config_t adcConfigStruct;
+   // adc_config_t adcConfigStruct1;
 
+    EnableIRQ(DEMO_ADC_IRQn);
 
     ADC_GetDefaultConfig(&adcConfigStruct);
+    //ADC_GetDefaultConfig(&adcConfigStruct1);
+
      // adcConfigStruct.ResolutionMode=g_Adc_8bitFullRange;
      // ADC->SC3 |= ADC_SC3_MODE(1);  // Chọn độ phân giải 12-bit
       adcConfigStruct.ResolutionMode = kADC_Resolution12BitMode; // Đổi thành 12-bit
+     // adcConfigStruct1.ResolutionMode = kADC_Resolution12BitMode; // Đổi thành 12-bit
 
       ADC_Init(DEMO_ADC_BASE, &adcConfigStruct);
+     // ADC_Init(DEMO_ADC_BASE, &adcConfigStruct1);
+
          /* Enable the releated analog pins. */
          ADC_EnableHardwareTrigger(DEMO_ADC_BASE, false);
 
@@ -134,7 +141,6 @@ void Config_ADC(void)
          ADC_SetChannelConfig(DEMO_ADC_BASE, &adcChannelConfigStruct);
          ADC_EnableAnalogInput(DEMO_ADC_BASE, 1U << DEMO_ADC_USER_CHANNEL, true);
        //  ADC_SetChannelConfig(DEMO_ADC_BASE, &adcChannelConfigStruct);
-         EnableIRQ(DEMO_ADC_IRQn);
 
         // ADC_EnableInterrupts(ADC, kUART_TransmissionCompleteInterruptEnable);
 }
@@ -166,9 +172,9 @@ void PIT_CH0_IRQHandler(void)
      * CPU's entering the handler again and again. Adding DSB can prevent the issue from happening.
      */
 
-    PIT_StopTimer(PIT, kPIT_Chnl_0);
-   // ADC_SetChannelConfig(DEMO_ADC_BASE, &adcChannelConfigStruct);
-   // UART_WriteBlocking(DEMO_UART, g_tipString1, sizeof(g_tipString1));
+    ADC_SetChannelConfig(DEMO_ADC_BASE, &adcChannelConfigStruct);
+  //  PIT_StopTimer(PIT, kPIT_Chnl_0);
+  // UART_WriteBlocking(DEMO_UART, g_tipString1, sizeof(g_tipString1));
     __DSB();
 }
 uint8_t buffer_adc1[100];
@@ -215,50 +221,52 @@ uint8_t buffer_adc1[100];
 //	}
 ////}
 //
-//void PIT_CH1_IRQHandler(void)
-//{
+void PIT_CH1_IRQHandler(void)
+{
 //    /* Clear interrupt flag.*/
-//    PIT_ClearStatusFlags(DEMO_PIT_BASEADDR, DEMO_PIT_CHANNEL_1, kPIT_TimerFlag);
+   PIT_ClearStatusFlags(DEMO_PIT_BASEADDR, DEMO_PIT_CHANNEL_1, kPIT_TimerFlag);
 //    /* Added for, and affects, all PIT handlers. For CPU clock which is much larger than the IP bus clock,
 //     * CPU can run out of the interrupt handler before the interrupt flag being cleared, resulting in the
 //     * CPU's entering the handler again and again. Adding DSB can prevent the issue from happening.
 //     */
-//   ADC_SetChannelConfig(DEMO_ADC_BASE, &adcChannelConfigStruct);
+  // ADC_SetChannelConfig(DEMO_ADC_BASE, &adcChannelConfigStruct);
 //   // UART_WriteBlocking(DEMO_UART, g_tipString1, sizeof(g_tipString1));
 //  // Covert_ADC_to_Temper(g_AdcConversionValue);
 //
-//   float Voltage = (g_AdcConversionValue * 3.3) / 4095;
-//   //float Voltage=0.771;
-//    Temperature=17.977*Voltage*Voltage+142.68*Voltage-18.874;
-//   int intPart = (int)Temperature;
-//  int fracPart = (int)((Temperature - intPart) * 100);
+   float Voltage = (g_AdcConversionValue * 3.3) / 4095;
+  //   //float Voltage=0.771;
+    Temperature=17.977*Voltage*Voltage+142.68*Voltage-18.874;
 //
-//  if(Temperature < SP)
-//  {
-//      //GPIO_PinWrite(TOP_HEATER_OUTER_GPIO, TOP_HEATER_OUTER_PIN, 1U);
-//     // GPIO_PinWrite(TOP_HEATER_OUTER_GPIO, TOP_HEATER_OUTER_PIN, 0U);
-//
-//     // GPIO_PinWrite(BOTTOM_HEATER_GPIO, BOTTOM_HEATER_PIN, 1U);
-//    //  GPIO_PinWrite(BOTTOM_HEATER_GPIO, BOTTOM_HEATER_PIN, 0U);
-//
-//  }
-////  else if(Temperature<SP-2 )
-////  {
-////
-////
-////  }
-//  else if(Temperature>SP)
-//  {
-//      //GPIO_PinWrite(TOP_HEATER_OUTER_GPIO, TOP_HEATER_OUTER_PIN, 0U);
-//      //GPIO_PinWrite(BOTTOM_HEATER_GPIO, BOTTOM_HEATER_PIN, 0U);
-//  }
-//
-// //  snprintf(buffer_adc1, sizeof(buffer_adc1), "Voltage: %f\n", Voltage);
-//  	//  PRINTF("OK");
-//  // sprintf(buffer_adc1, "Temperature: %2d.%02d\n",intPart,abs(fracPart));
-//   //UART_WriteBlocking(DEMO_UART, buffer_adc1, sizeof(buffer_adc1));
-//    __DSB();
-//}
+ if(Temperature < 100)
+  {
+
+      GPIO_PinWrite(TOP_HEATER_OUTER_GPIO, TOP_HEATER_OUTER_PIN, 1U);
+    //  GPIO_PinWrite(TOP_HEATER_OUTER_GPIO, TOP_HEATER_OUTER_PIN, 0U);
+
+     GPIO_PinWrite(BOTTOM_HEATER_GPIO, BOTTOM_HEATER_PIN, 1U);
+    //  GPIO_PinWrite(BOTTOM_HEATER_GPIO, BOTTOM_HEATER_PIN, 0U);
+ }
+  else if(Temperature>100)
+  {
+	 //. FTM_StopTimer(BOARD_FTM_BASEADDR);
+      GPIO_PinWrite(TOP_HEATER_OUTER_GPIO, TOP_HEATER_OUTER_PIN, 0U);
+      GPIO_PinWrite(BOTTOM_HEATER_GPIO, BOTTOM_HEATER_PIN, 0U);
+  }
+
+ int intPart = (int)Temperature;
+int fracPart = (int)((Temperature - intPart) * 100);
+
+ sprintf(buffer_adc1, "Temperature: %2d.%02d\n",intPart,abs(fracPart));
+ //UART_WriteBlocking(DEMO_UART, buffer_adc1, sizeof(buffer_adc1));
+
+
+  // snprintf(buffer_adc1, sizeof(buffer_adc1), "Voltage: %f\n", Voltage);
+  	//  PRINTF("OK");
+
+// sprintf(buffer_adc1, "Temperature: %d\n",g_AdcConversionValue);
+
+    __DSB();
+}
 
 //
 //void BOARD_TPM_HANDLER_1(void)
