@@ -294,8 +294,7 @@ int main(void) {
 
     BOARD_InitDebugConsole();
     BOARD_InitBootPeripherals();
- //   Config_UART();
- Config_PWM_NEWTRAL_LINE();
+ //Config_PWM_NEWTRAL_LINE();
 
  //Fid github
 
