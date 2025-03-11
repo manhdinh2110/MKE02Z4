@@ -60,7 +60,7 @@ void Config_PWM_NEWTRAL_LINE(void)
     ftmParam.enableDeadtime        = false;
     if (kStatus_Success !=
     FTM_SetupPwm(BOARD_FTM_BASEADDR, &ftmParam, 1U, kFTM_CenterAlignedPwm, DEMO_PWM_FREQUENCY, FTM_SOURCE_CLOCK));
-	FTM_StartTimer(BOARD_FTM_BASEADDR, kFTM_SystemClock);
+	//FTM_StartTimer(BOARD_FTM_BASEADDR, kFTM_SystemClock);
 
 }
 

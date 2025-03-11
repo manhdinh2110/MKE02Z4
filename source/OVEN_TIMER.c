@@ -73,7 +73,7 @@ void Config_Timer(void)
     EnableIRQ(BOARD_TPM_IRQ_NUM_0);
 //    //EnableIRQ(BOARD_TPM_IRQ_NUM_1);
 ////
-    //TPM_StartTimer(BOARD_TPM_0, kTPM_SystemClock);
+    TPM_StartTimer(BOARD_TPM_0, kTPM_SystemClock);
    // TPM_StartTimer(BOARD_TPM_1, kTPM_SystemClock);
 
    pit_config_t pitConfig;
@@ -116,7 +116,7 @@ void Config_Timer(void)
 
 adc_channel_config_t adcChannelConfigStruct;
 
-uint32_t count=0;
+extern uint32_t count;
 uint8_t checkLed;
 volatile bool pitDone = false;
 
@@ -132,22 +132,22 @@ volatile bool pitDone = false;
 //
 //
 //}
-//void TPM0_IRQHandler(void)
-//{
-//    /* Clear interrupt flag.*/
-//    TPM_ClearStatusFlags(TPM0, kTPM_TimeOverflowFlag);
-//    count++;
-// //   delay_ms(10);
-//    if(count>80000)
-//    {
-//    	checkLed=0;
-//        NVIC_EnableIRQ(KBI0_IRQn);  // Vô hiệu hóa ngắt KBI0 trong NVIC
-//    	FTM_StartTimer(BOARD_FTM_BASEADDR, kFTM_SystemClock);
-// 	  count=0;
-//    }
-//
-//    __DSB();
-//}
+void TPM0_IRQHandler(void)
+{
+    /* Clear interrupt flag.*/
+    TPM_ClearStatusFlags(TPM0, kTPM_TimeOverflowFlag);
+    count++;
+ //   delay_ms(10);
+    if(count>110000)
+    {
+    	checkLed=0;
+        NVIC_EnableIRQ(KBI0_IRQn);
+    	FTM_StartTimer(BOARD_FTM_BASEADDR, kFTM_SystemClock);
+ 	  count=0;
+    }
+
+    __DSB();
+}
 
 
 

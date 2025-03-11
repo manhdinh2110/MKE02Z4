@@ -155,6 +155,9 @@ if(convertedStr==1)
     NVIC_EnableIRQ(KBI0_IRQn);  // Vô hiệu hóa ngắt KBI0 trong NVIC
 	FTM_StartTimer(BOARD_FTM_BASEADDR, kFTM_SystemClock);
     PIT_EnableInterrupts(DEMO_PIT_BASEADDR, DEMO_PIT_CHANNEL_1, kPIT_TimerInterruptEnable);
+    checkLed=1;
+    TPM_EnableInterrupts(BOARD_TPM_0, kTPM_TimeOverflowInterruptEnable);
+
 }
 
 //ON LED
@@ -165,7 +168,7 @@ if(convertedStr==3)
     checkLed=1;
     NVIC_EnableIRQ(KBI0_IRQn);  // Vô hiệu hóa ngắt KBI0 trong NVIC
 	FTM_StartTimer(BOARD_FTM_BASEADDR, kFTM_SystemClock);
-  //  PIT_EnableInterrupts(DEMO_PIT_BASEADDR, DEMO_PIT_CHANNEL_1, kPIT_TimerInterruptEnable);
+   PIT_EnableInterrupts(DEMO_PIT_BASEADDR, DEMO_PIT_CHANNEL_1, kPIT_TimerInterruptEnable);
     TPM_EnableInterrupts(BOARD_TPM_0, kTPM_TimeOverflowInterruptEnable);
 
 }
@@ -210,38 +213,55 @@ void ADC_IRQHandler(void)
     SDK_ISR_EXIT_BARRIER;
 }
 
-
+int test1=0;
 uint16_t countFreq1 = 9800;
 
 static bool state=0;
 extern float Temperature;
 volatile bool isRisingEdge = true;
+kbi_config_t kbiConfig;
+volatile bool triacTrigger = false;
+uint32_t count;
+
+
 
 void KBI0_IRQHandler(void)
 {
     if (KBI_IsInterruptRequestDetected(EXAMPLE_KBI))
     {
+        test1++;
 
-		if (GPIO_PinRead(DOOR_SENSOR_GPIO,DOOR_SENSOR_PIN) == 0||checkLed==1)
-		{
+        if (test1 % 2 == 0)
+        {
+            EXAMPLE_KBI->ES &= ~(1 << EXAMPLE_KBI_PINS);
+            test1=0;
+        }
+        else
+        {
+            EXAMPLE_KBI->ES |= (1 << EXAMPLE_KBI_PINS);
+            test1=1;
 
-			SDK_DelayAtLeastUs(countFreq1, CLOCK_GetFreq(kCLOCK_CoreSysClk));
-			//delay_ms(countFreq1*1000);
-			GPIO_PinWrite(TRIAC_LAMP_GPIO,TRIAC_LAMP_PIN,1);
-			//delay_ms(10*1000);
-			SDK_DelayAtLeastUs(10, CLOCK_GetFreq(kCLOCK_CoreSysClk));
-			GPIO_PinWrite(TRIAC_LAMP_GPIO,TRIAC_LAMP_PIN,0);
-			if (countFreq1 >150){
+        }
 
-			    countFreq1=countFreq1-50;
-			//	KBI_ClearInterruptFlag(EXAMPLE_KBI);
-				KBI_ClearInterruptFlag(EXAMPLE_KBI);
+    		if (GPIO_PinRead(DOOR_SENSOR_GPIO,DOOR_SENSOR_PIN) == 0||checkLed==1)
+    		{
+           // triacTrigger = true; // Đánh dấu flag, xử lý trong `main()`
+            SDK_DelayAtLeastUs(countFreq1, CLOCK_GetFreq(kCLOCK_CoreSysClk));
+            			//delay_ms(countFreq1*1000);
+            			GPIO_PinWrite(TRIAC_LAMP_GPIO,TRIAC_LAMP_PIN,1);
+            			//delay_ms(10*1000);
+            			SDK_DelayAtLeastUs(10, CLOCK_GetFreq(kCLOCK_CoreSysClk));
+            			GPIO_PinWrite(TRIAC_LAMP_GPIO,TRIAC_LAMP_PIN,0);
+			if (countFreq1 >15){
 
+			    countFreq1=countFreq1-15;
 			}
 			else
 			{
-				countFreq1=150;
+				countFreq1=15;
+
 			}
+			KBI_ClearInterruptFlag(EXAMPLE_KBI);
 
 
 		}
@@ -253,35 +273,28 @@ void KBI0_IRQHandler(void)
 			SDK_DelayAtLeastUs(10, CLOCK_GetFreq(kCLOCK_CoreSysClk)); // Delay 1s
 			GPIO_PinWrite(TRIAC_LAMP_GPIO,TRIAC_LAMP_PIN,0);
 
-			if (countFreq1 <8000)
+			if (countFreq1 <9000)
 			{
-				countFreq1=countFreq1+30;
+				countFreq1=countFreq1+15;
 				KBI_ClearInterruptFlag(EXAMPLE_KBI);
 			}
+
 			else {
-				//countFreq1=9000;
+				countFreq1=9000;
 				check=1;
 				FTM_StopTimer(BOARD_FTM_BASEADDR);
 				NVIC_DisableIRQ(KBI0_IRQn);
 				TPM_DisableInterrupts(BOARD_TPM_0, kTPM_TimeOverflowInterruptEnable);
+			 	  count=0;
 
 			}
 		}
-    }
+   }
 }
 
 volatile bool mode =0;
 volatile bool door_open = false; // Biến trạng thái cửa
 uint8_t intPart;
-
-void TPM0_IRQHandler(void)
-{
-    /* Clear interrupt flag.*/
-    TPM_ClearStatusFlags(TPM0, kTPM_TimeOverflowFlag);
-
-
-    __DSB();
-}
 
 
 int main(void) {
@@ -297,11 +310,10 @@ int main(void) {
 
    // FTM0_Init();
 
-    kbi_config_t kbiConfig;
     kbiConfig.mode        = kKBI_EdgesDetect;
     kbiConfig.pinsEnabled = 1 << EXAMPLE_KBI_PINS;
-    kbiConfig.pinsEdge    = (0 << EXAMPLE_KBI_PINS);
-    NVIC_DisableIRQ(KBI0_IRQn);  // Vô hiệu hóa ngắt KBI0 trong NVIC
+    kbiConfig.pinsEdge    = (1 << EXAMPLE_KBI_PINS);
+   NVIC_DisableIRQ(KBI0_IRQn);  // Vô hiệu hóa ngắt KBI0 trong NVIC
     KBI_Init(EXAMPLE_KBI, &kbiConfig);
 
     Config_UART();
@@ -326,15 +338,25 @@ int main(void) {
     Config_Timer();
     while(1) {
     	//delay_ms(1000);
+
+//    	if(triacTrigger)
+//    	{
+//            triacTrigger = false; // Đánh dấu flag, xử lý trong `main()`
+//
+//
+//
+//    	}
+
  if(GPIO_PinRead(DOOR_SENSOR_GPIO,DOOR_SENSOR_PIN)==0)
  {
+ 	SDK_DelayAtLeastUs(1000000, CLOCK_GetFreq(kCLOCK_CoreSysClk)); // Delay 1s
+	 PIT_DisableInterrupts(DEMO_PIT_BASEADDR, DEMO_PIT_CHANNEL_1, kPIT_TimerInterruptEnable);
+	 FTM_StartTimer(BOARD_FTM_BASEADDR, kFTM_SystemClock);
 	 NVIC_EnableIRQ(KBI0_IRQn);
 	 GPIO_PinWrite(BACK_FAN_GPIO, BACK_FAN_PIN, 0U);
 	 GPIO_PinWrite(TOP_HEATER_OUTER_GPIO, TOP_HEATER_OUTER_PIN, 0U);
 	 GPIO_PinWrite(BOTTOM_HEATER_GPIO, BOTTOM_HEATER_PIN, 0U);
-	 PIT_DisableInterrupts(DEMO_PIT_BASEADDR, DEMO_PIT_CHANNEL_1, kPIT_TimerInterruptEnable);
-	 FTM_StartTimer(BOARD_FTM_BASEADDR, kFTM_SystemClock);
-	 }
+		}
  else
  {
 		//PIT_EnableInterrupts(DEMO_PIT_BASEADDR, DEMO_PIT_CHANNEL_1, kPIT_TimerInterruptEnable);
