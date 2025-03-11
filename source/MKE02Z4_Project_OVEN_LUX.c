@@ -297,33 +297,12 @@ int main(void) {
 
    // FTM0_Init();
 
-
-    FTM_GetDefaultConfig(&ftmInfo);
-    /* Initialize FTM module */
-    FTM_Init(FTM0, &ftmInfo);
-
-    /* Setup dual-edge capture on a FTM channel pair */
-    FTM_SetupInputCapture(FTM0, kFTM_Chnl_0, kFTM_FallingEdge, 0);
-
-    /* Set the timer to be in free-running mode */
-    FTM_SetTimerPeriod(FTM0, 0xFFFF);
-
-    /* Enable channel interrupt when the second edge is detected */
-    FTM_EnableInterrupts(FTM0, FTM_CHANNEL_INTERRUPT_ENABLE);
-
-    /* Enable at the NVIC */
-    EnableIRQ(FTM_INTERRUPT_NUMBER);
-
-    FTM_StartTimer(BOARD_FTM_BASEADDR, kFTM_SystemClock);
-
-
-
-//    kbi_config_t kbiConfig;
-//    kbiConfig.mode        = kKBI_EdgesDetect;
-//    kbiConfig.pinsEnabled = 1 << EXAMPLE_KBI_PINS;
-//    kbiConfig.pinsEdge    = (0 << EXAMPLE_KBI_PINS);
-//    NVIC_DisableIRQ(KBI0_IRQn);  // Vô hiệu hóa ngắt KBI0 trong NVIC
-//    KBI_Init(EXAMPLE_KBI, &kbiConfig);
+    kbi_config_t kbiConfig;
+    kbiConfig.mode        = kKBI_EdgesDetect;
+    kbiConfig.pinsEnabled = 1 << EXAMPLE_KBI_PINS;
+    kbiConfig.pinsEdge    = (0 << EXAMPLE_KBI_PINS);
+    NVIC_DisableIRQ(KBI0_IRQn);  // Vô hiệu hóa ngắt KBI0 trong NVIC
+    KBI_Init(EXAMPLE_KBI, &kbiConfig);
 
     Config_UART();
     Config_PWM_NEWTRAL_LINE();
