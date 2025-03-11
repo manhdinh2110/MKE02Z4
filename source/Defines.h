@@ -24,7 +24,7 @@
 #define TPM_SOURCE_CLOCK (CLOCK_GetFreq(kCLOCK_BusClk) / 4)
 #ifndef DEMO_TIMER_PERIOD_US
 /* Set counter period to 1ms */
-#define DEMO_TIMER_PERIOD_US (1000U)
+#define DEMO_TIMER_PERIOD_US (90000000U)
 #endif
 #ifndef TPM_PRESCALER
 /* Calculate the clock division based on the PWM frequency to be obtained */

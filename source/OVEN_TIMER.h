@@ -53,6 +53,18 @@
 #define TPM_PRESCALER_1 TPM_CalculateCounterClkDiv(BOARD_TPM_1, 100000U / DEMO_TIMER_PERIOD_US, TPM_SOURCE_CLOCK);
 #endif
 
+
+
+
+#define DEMO_PIT_BASEADDR PIT
+#define DEMO_PIT_CHANNEL  kPIT_Chnl_0
+#define PIT_LED_HANDLER   PIT_CH0_IRQHandler
+#define PIT_IRQ_ID        PIT_CH0_IRQn
+
+
+#define DEMO_PIT_CHANNEL_1  kPIT_Chnl_1
+#define PIT_IRQ_ID_1        PIT_CH1_IRQn
+
 /******************************************************************************
 *                                                                            *
 *  												FUNCTION	                                        *
@@ -61,7 +73,6 @@
 
 
 void Config_Timer(void);
-void Delay_ms(uint32_t ms);
-
+void delay_ms(uint16_t ms);
 
 #endif

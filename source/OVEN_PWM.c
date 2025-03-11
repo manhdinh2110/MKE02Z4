@@ -21,7 +21,7 @@ volatile uint8_t getCharValue     = 0U;
 #define max 				5000
 #define min 				0
 
-float Temperature;
+int Temperature;
 
 PID PID_Temper_1={1.0,0.3,0.2,0,0,0,0,0};
 PID PID_Temper_2={1.0,0.3,0.2,0,0,0,0,0};
@@ -48,8 +48,8 @@ void Config_PWM_NEWTRAL_LINE(void)
     ftm_pwm_level_select_t pwmLevel = FTM_PWM_ON_LEVEL;
 
     FTM_GetDefaultConfig(&ftmInfo);
-//    ftmInfo.prescale = FTM_CalculateCounterClkDiv(BOARD_FTM_BASEADDR, DEMO_PWM_FREQUENCY, FTM_SOURCE_CLOCK);
-//    FTM_Init(BOARD_FTM_BASEADDR, &ftmInfo);
+   ftmInfo.prescale = FTM_CalculateCounterClkDiv(BOARD_FTM_BASEADDR, DEMO_PWM_FREQUENCY, FTM_SOURCE_CLOCK);
+   FTM_Init(BOARD_FTM_BASEADDR, &ftmInfo);
          /* Configure ftm params with frequency 24kHZ */
    ftmParam.chnlNumber            = BOARD_FTM_CHANNEL;
     ftmParam.level                 = pwmLevel;
@@ -59,7 +59,7 @@ void Config_PWM_NEWTRAL_LINE(void)
     ftmParam.enableComplementary   = false;
     ftmParam.enableDeadtime        = false;
     if (kStatus_Success !=
-    FTM_SetupPwm(BOARD_FTM_BASEADDR, &ftmParam, 1U, kFTM_CenterAlignedPwm, DEMO_PWM_FREQUENCY, FTM_SOURCE_CLOCK))
+    FTM_SetupPwm(BOARD_FTM_BASEADDR, &ftmParam, 1U, kFTM_CenterAlignedPwm, DEMO_PWM_FREQUENCY, FTM_SOURCE_CLOCK));
 	FTM_StartTimer(BOARD_FTM_BASEADDR, kFTM_SystemClock);
 
 }

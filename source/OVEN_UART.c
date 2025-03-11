@@ -34,8 +34,10 @@ void Config_UART(void)
 	//UART_WriteBlocking(DEMO_UART,g_tipString,sizeof(g_tipString));
 
     /* Enable RX interrupt. */
-  //  UART_EnableInterrupts(DEMO_UART, kUART_RxDataRegFullInterruptEnable | kUART_RxOverrunInterruptEnable);
-   // EnableIRQ(DEMO_UART_IRQn);
+  UART_EnableInterrupts(DEMO_UART, kUART_RxDataRegFullInterruptEnable | kUART_RxOverrunInterruptEnable);
+    EnableIRQ(DEMO_UART_IRQn);
+    NVIC_SetPriority(DEMO_UART_IRQn, 0);
+
 
 }
 void UART_WriteMultipleBytes(uint8_t *data, uint32_t length) {

@@ -102,15 +102,15 @@ instance:
       - enable_custom_name: 'false'
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
 /* clang-format on */
-kbi_config_t KBI0_Config = {
-  .pinsEnabled = 0x8U,
-  .pinsEdge = 0x8U,
-  .mode = kKBI_EdgesDetect
-};
+//kbi_config_t KBI0_Config = {
+//  .pinsEnabled = 0x8U,
+//  .pinsEdge = 0x8U,
+//  .mode = kKBI_EdgesDetect
+//};
 
-static void KBI0_init(void) {
-  KBI_Init(KBI0_PERIPHERAL, &KBI0_Config);
-}
+//static void KBI0_init(void) {
+// // KBI_Init(KBI0_PERIPHERAL, &KBI0_Config);
+//}
 
 /***********************************************************************************************************************
  * FTM2 initialization code
@@ -167,7 +167,7 @@ instance:
     - timer_interrupts: ''
     - enable_irq: 'false'
     - ftm_interrupt:
-      - IRQn: 'FTM0_IRQn'
+      - IRQn: 'FTM2_IRQn'
       - enable_interrrupt: 'enabled'
       - enable_priority: 'false'
       - priority: '0'
@@ -194,7 +194,6 @@ const ftm_config_t FTM2_config = {
   .bdmMode = kFTM_BdmMode_0,
   .useGlobalTimeBase = false
 };
-
 const ftm_chnl_pwm_config_param_t FTM2_pwmSignalParams[] = {
   {
     .chnlNumber = kFTM_Chnl_2,
@@ -202,13 +201,11 @@ const ftm_chnl_pwm_config_param_t FTM2_pwmSignalParams[] = {
     .dutyValue = 600,
   }
 };
-
 static void FTM2_init(void) {
   FTM_Init(FTM2_PERIPHERAL, &FTM2_config);
   FTM_SetTimerPeriod(FTM2_PERIPHERAL, FTM2_TIMER_MODULO_VALUE);
   FTM_SetupPwmMode(FTM2_PERIPHERAL, FTM2_pwmSignalParams, sizeof(FTM2_pwmSignalParams) / sizeof(ftm_chnl_pwm_config_param_t), kFTM_EdgeAlignedPwm);
 
-  FTM_StartTimer(FTM2_PERIPHERAL, kFTM_SystemClock);
 }
 
 /***********************************************************************************************************************
@@ -217,8 +214,8 @@ static void FTM2_init(void) {
 void BOARD_InitPeripherals(void)
 {
   /* Initialize components */
-  KBI0_init();
-  FTM2_init();
+ // KBI0_init();
+ // FTM2_init();
 }
 
 /***********************************************************************************************************************

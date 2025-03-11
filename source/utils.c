@@ -212,47 +212,74 @@ void String_Copy(uint8_t* stringin, uint8_t* stringout)
 //		stringin++;
 //	}
 //}
-void String_Split(uint8_t* stringin, uint8_t character, uint8_t startpos, uint8_t* stringout, size_t outSize)
+//void String_Split(uint8_t* stringin, uint8_t character, uint8_t startpos, uint8_t* stringout, size_t outSize)
+//{
+//    uint8_t count = 0;
+//    size_t index = 0;
+//
+//    // Xóa dữ liệu của stringout
+//    memset(stringout, 0, outSize);
+//
+//    // Nếu startpos = 0, lấy dữ liệu ngay từ đầu
+//    if (startpos == 0) {
+//        while (*stringin != '\0' && *stringin != character) {
+//            if (index < outSize - 1) {
+//                stringout[index++] = *stringin;
+//            }
+//            stringin++;
+//        }
+//        stringout[index] = '\0'; // Kết thúc chuỗi
+//        return;
+//    }
+//
+//    // Xử lý các trường hợp startpos > 0
+//    while (*stringin != '\0')
+//    {
+//        if (*stringin == character)
+//        {
+//            count++;
+//        }
+//        else
+//        {
+//            if (count == startpos)
+//            {
+//                if (index < outSize - 1) // Tránh tràn bộ nhớ
+//                {
+//                    stringout[index++] = *stringin;
+//                }
+//            }
+//        }
+//        stringin++;
+//    }
+//
+//   // stringout[index] = '\0'; // Đảm bảo kết thúc chuỗi
+//}
+
+
+void String_Split(uint8_t* stringin, uint8_t character, uint8_t startpos, uint8_t* stringout)
 {
-    uint8_t count = 0;
-    size_t index = 0;
-
-    // Xóa dữ liệu của stringout
-    memset(stringout, 0, outSize);
-
-    // Nếu startpos = 0, lấy dữ liệu ngay từ đầu
-    if (startpos == 0) {
-        while (*stringin != '\0' && *stringin != character) {
-            if (index < outSize - 1) {
-                stringout[index++] = *stringin;
-            }
-            stringin++;
-        }
-        stringout[index] = '\0'; // Kết thúc chuỗi
-        return;
-    }
-
-    // Xử lý các trường hợp startpos > 0
-    while (*stringin != '\0')
-    {
-        if (*stringin == character)
-        {
-            count++;
-        }
-        else
-        {
-            if (count == startpos)
-            {
-                if (index < outSize - 1) // Tránh tràn bộ nhớ
-                {
-                    stringout[index++] = *stringin;
-                }
-            }
-        }
-        stringin++;
-    }
-
-    stringout[index] = '\0'; // Đảm bảo kết thúc chuỗi
+	uint8_t count = 0;
+	while(stringout[count] != '\0')
+	{
+		stringout[count] = 0; //clear string data
+		count++;
+	}
+	count = 0;
+	while(*stringin != '\0')
+	{
+		if(*stringin == character)
+		{
+			count++;
+		}
+		else
+		{
+			if(count == startpos)
+			{
+				*(stringout++) = *stringin;
+			}
+		}
+		stringin++;
+	}
 }
 /******************************************************************************
  * @fn     String_Split_By_Lng     

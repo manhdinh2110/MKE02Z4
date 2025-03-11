@@ -349,7 +349,7 @@
                         </set>
                         <setting name="enable_irq" value="false"/>
                         <struct name="ftm_interrupt">
-                           <setting name="IRQn" value="FTM0_IRQn"/>
+                           <setting name="IRQn" value="FTM2_IRQn"/>
                            <setting name="enable_interrrupt" value="enabled"/>
                            <setting name="enable_priority" value="false"/>
                            <setting name="priority" value="0"/>

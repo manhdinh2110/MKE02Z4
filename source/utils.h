@@ -15,8 +15,8 @@ void BytesToUint32(uint8_t *b, uint32_t *u);
 void String_Clear(uint8_t* string);
 void String_RemoveCRLF(uint8_t* stringin, uint8_t* stringout);
 void String_Copy(uint8_t* stringin, uint8_t* stringout);
-//void String_Split(uint8_t* stringin, uint8_t character, uint8_t startpos, uint8_t* stringout);
-void String_Split(uint8_t* stringin, uint8_t character, uint8_t startpos, uint8_t* stringout, size_t outSize);
+void String_Split(uint8_t* stringin, uint8_t character, uint8_t startpos, uint8_t* stringout);
+//void String_Split(uint8_t* stringin, uint8_t character, uint8_t startpos, uint8_t* stringout, size_t outSize);
 
 void String_Split_By_Lng(uint8_t* stringin, uint8_t startpos, uint8_t length, uint8_t* stringout);
 void String_Merger(uint8_t* strfirst, uint8_t* strsecond, uint8_t character, uint8_t* stringout);
